@@ -1,6 +1,7 @@
 // src/components/Sidebar.js
 import React, { useState } from 'react';
 import './Sidebar.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,7 +13,7 @@ const Sidebar = () => {
   return (
     <>
       <button className="menu-toggle" onClick={toggleSidebar}>
-        ☰
+        <i className="bi bi-list"></i> 
       </button>
 
       <nav className={`sidebar ${isOpen ? 'open' : ''}`}>

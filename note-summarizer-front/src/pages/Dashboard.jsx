@@ -2,12 +2,19 @@
 import React, { useState } from 'react';
 import './Dashboard.css';
 import Sidebar from '../components/Sidebar';
+import { Typography } from '@mui/material';
 
 const Dashboard = () => {
   const [noteTitle, setNoteTitle] = useState('');
   const [category, setCategory] = useState('');
   const [file, setFile] = useState(null);
   const [textInput, setTextInput] = useState('');
+
+    const user = {
+    username: 'Muthu19',
+    email: 'user@example.com',
+    role: 'Student'
+  };
 
   const handleUpload = (e) => {
     e.preventDefault();
@@ -25,11 +32,15 @@ const Dashboard = () => {
       <Sidebar />
 
       <main className="dashboard-main">
-        <section className="user-summary">
-          <h2>Welcome back, 👋</h2>
-          <p>Email: user@example.com</p>
-          <p>Role: Student</p>
-        </section>
+<section className="user-summary" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  <h2>Welcome back, 👋</h2>
+  {user && (
+    <Typography>
+      Hello, {user.username || user.email || 'User'}
+    </Typography>
+  )}
+</section>
+
 
         <section className="recent-activity">
           <h3>📌 Recent Activity</h3>

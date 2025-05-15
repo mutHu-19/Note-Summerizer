@@ -9,7 +9,7 @@ import SignUpPage from './components/SignUp';
 import LoginPage from './components/Login';
 import DashboardPage from './pages/Dashboard';
 import UploadPage from './pages/Upload';
-import NoteDetailsPage from './pages/NoteDetail';
+import NoteDetails from './pages/NoteDetail';
 import QuizPage from './pages/Quize';
 import ResultsPage from './pages/Result';
 import ProfilePage from './pages/Profile';
@@ -28,7 +28,7 @@ function App() {
         {/* Protected Routes */}
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/upload" element={<UploadPage />} />
-        <Route path="/notes/:id" element={<NoteDetailsPage />} />
+        <Route path="/notes/:id" element={<NoteDetails />} />
         <Route path="/quiz/:id" element={<QuizPage />} />
         <Route path="/results/:id" element={<ResultsPage />} />
         <Route path="/profile" element={<ProfilePage />} />
