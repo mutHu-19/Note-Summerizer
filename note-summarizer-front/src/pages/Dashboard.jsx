@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import './Dashboard.css';
 import Sidebar from '../components/Sidebar';
 import { Typography } from '@mui/material';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const Dashboard = () => {
   const [noteTitle, setNoteTitle] = useState('');
@@ -16,15 +18,43 @@ const Dashboard = () => {
     role: 'Student'
   };
 
-  const handleUpload = (e) => {
+const handleUpload = async (e) => {
     e.preventDefault();
-    // TODO: Add upload logic
-    console.log({
-      title: noteTitle,
-      category,
-      file,
-      text: textInput
-    });
+
+    if (!noteTitle || !category || (!file && !textInput)) {
+      toast.error('Please fill in all required fields.');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('title', noteTitle);
+      formData.append('category', category);
+      formData.append('text', textInput);
+      if (file) formData.append('file', file);
+
+      const token = localStorage.getItem('token'); // Optional: If using JWT auth
+
+      const response = await axios.post(
+        'http://localhost:5000/api/notes/upload',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            ...(token && { Authorization: `Bearer ${token}` })
+          }
+        }
+      );
+
+      toast.success('Note uploaded successfully!');
+      setNoteTitle('');
+      setCategory('');
+      setFile(null);
+      setTextInput('');
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || 'Failed to upload note.');
+    }
   };
 
   return (

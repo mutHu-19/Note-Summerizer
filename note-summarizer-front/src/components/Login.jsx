@@ -1,25 +1,52 @@
+// src/pages/Login.jsx
 import React, { useState } from 'react';
 import './Login.css';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    remember: false,
   });
 
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: value,
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: API login logic
-    console.log(formData);
+    setError('');
+    setSuccess('');
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (response.data.success) {
+        toast.success("Signup successful!");
+        localStorage.setItem('token', response.data.token);
+        // Redirect to dashboard
+        navigate('/dashboard');
+        localStorage.setItem('token', response.data.token);
+      } else {
+toast.error("Login failed!");      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Login failed. Server error.');
+    }
   };
 
   return (
@@ -45,6 +72,9 @@ const Login = () => {
             required
           />
 
+          {/* Error and Success Messages */}
+          {error && <p className="error-msg">{error}</p>}
+          {success && <p className="success-msg">{success}</p>}
 
           <button type="submit" className="login-btn">Log In</button>
         </form>

@@ -16,9 +16,13 @@ import ProfilePage from './pages/Profile';
 import NotFoundPage from './pages/NotFoundPage';
 import Footer from './components/Footer';
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 function App() {
   return (
     <Router>
+      <ToastContainer position="top-right" autoClose={3000} />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
@@ -36,7 +40,7 @@ function App() {
         {/* Catch-all Route for 404 Not Found */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      <Footer/>
+      <Footer />
     </Router>
   );
 }

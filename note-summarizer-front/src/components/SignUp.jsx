@@ -1,6 +1,10 @@
 // src/pages/Signup.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Signup.css';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -10,22 +14,50 @@ const Signup = () => {
     confirmPassword: ''
   });
 
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-const handleSubmit = (e) => {
-  e.preventDefault();
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
 
-  if (formData.password !== formData.confirmPassword) {
-    alert("Passwords do not match!");
-    return;
-  }
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
 
-  // Proceed with API call or form submission
-  console.log("Form submitted:", formData);
-};
+    try {
+      const response = await axios.post('http://localhost:5000/api/auth/register', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
 
+      if (response.data.success) {
+        toast.success('Signup successful! You can now log in.');
+        setFormData({
+          name: '',
+          email: '',
+          password: '',
+          confirmPassword: ''
+        });
+
+          setTimeout(() => {
+    navigate('/login');
+  }, 1500); 
+      } else {
+toast.error("Invalid email or password!");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Signup failed. Server error.');
+    }
+  };
 
   return (
     <div className="signup-container">
@@ -64,6 +96,9 @@ const handleSubmit = (e) => {
             onChange={handleChange}
             required
           />
+                    {error && <p className="error-msg">{error}</p>}
+          {success && <p className="success-msg">{success}</p>}
+
           <button type="submit" className="signup-btn">Sign Up</button>
         </form>
 

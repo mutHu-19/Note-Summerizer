@@ -3,29 +3,47 @@ const parsePDF = require('../utils/pdfParser');
 const { summarizeText, generateQuiz } = require('../services/aiService');
 
 exports.uploadNote = async (req, res) => {
-  let text = '';
-  if (req.file.mimetype === 'application/pdf') {
-    text = await parsePDF(req.file.path);
-  } else {
-    text = req.body.text;
+  try {
+    const { title, category, text } = req.body;
+    const file = req.file;
+
+    if (!title || !category || (!text && !file)) {
+      return res.status(400).json({ message: 'Missing required fields.' });
+    }
+
+    let finalText = text || '';
+
+    if (file && file.mimetype === 'application/pdf') {
+      finalText = await parsePDF(file.path);
+    }
+
+    const summary = await summarizeText(finalText);
+    const quizzes = await generateQuiz(finalText);
+
+    const note = await Note.create({
+      title,
+      category,
+      user: req.user.id,
+      originalText: finalText,
+      summary,
+      quizzes,
+      filePath: file ? file.path : null,
+    });
+
+    res.status(201).json({ message: 'Note uploaded successfully.', note });
+  } catch (err) {
+    console.error('Upload Note Error:', err);
+    res.status(500).json({ message: 'Server error while uploading note.' });
   }
-
-  const summary = await summarizeText(text);
-  const quizzes = await generateQuiz(text);
-
-  const note = await Note.create({
-    user: req.user.id,
-    originalText: text,
-    summary,
-    quizzes
-  });
-
-  res.json(note);
 };
 
 exports.getNotes = async (req, res) => {
-  const notes = await Note.find({ user: req.user.id }).sort({ createdAt: -1 });
-  res.json(notes);
+  try {
+    const notes = await Note.find({ user: req.user.id }).sort({ createdAt: -1 });
+    res.json(notes);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch notes' });
+  }
 };
 
 exports.getNoteById = async (req, res) => {
